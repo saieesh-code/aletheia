@@ -1,0 +1,61 @@
+[package]
+name    = "aletheia-server"
+version = "2.0.0"
+edition = "2021"
+
+[[bin]]
+name = "aletheia-server"
+path = "src/main.rs"
+
+[dependencies]
+# ── Web framework ─────────────────────────────────────────────────────────────
+axum       = { version = "0.7", features = ["macros"] }
+tokio      = { version = "1",   features = ["full"] }
+tower      = "0.4"
+tower-http = { version = "0.5", features = [
+    "fs",
+    "trace",
+    "compression-gzip",
+    "limit",
+    "request-id",
+    "timeout",
+    "cors",
+] }
+
+# ── Serialization ─────────────────────────────────────────────────────────────
+serde      = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# ── Database ──────────────────────────────────────────────────────────────────
+# NO "macros" feature → no sqlx::query! → no DATABASE_URL at compile time
+sqlx = { version = "0.7", features = [
+    "postgres",
+    "runtime-tokio-rustls",
+    "uuid",
+    "chrono",
+    "json",
+] }
+
+# ── Types ─────────────────────────────────────────────────────────────────────
+uuid   = { version = "1",   features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+# ── Crypto ────────────────────────────────────────────────────────────────────
+sha2   = "0.10"
+hex    = "0.4"
+base64 = { version = "0.21", features = ["std"] }
+
+# ── Observability ─────────────────────────────────────────────────────────────
+tracing            = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
+anyhow    = "1"
+thiserror = "1"
+dotenvy   = "0.15"
+
+[profile.release]
+opt-level     = 3
+lto           = "thin"
+codegen-units = 1
+strip         = true

@@ -1,0 +1,52 @@
+# =============================================================================
+# Aletheia — Render Web Service (single Docker container)
+#
+# Serves everything from one URL:
+#   /api/v2/*  →  Axum REST API handlers
+#   /health    →  health check
+#   /ready     →  readiness check (DB ping)
+#   /*         →  React SPA (static files, SPA fallback → index.html)
+# =============================================================================
+
+services:
+  - type: web
+    name: aletheia
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      # Auto-wired from the managed Postgres instance below
+      - key: DATABASE_URL
+        fromDatabase:
+          name: aletheia-db
+          property: connectionString
+
+      - key: PORT
+        value: "8080"
+
+      - key: RUST_LOG
+        value: "aletheia_server=info,tower_http=warn"
+
+      - key: ATTESTATION_STRICT
+        value: "false"
+
+      - key: NONCE_TTL_SECS
+        value: "172800"
+
+      - key: RATE_LIMIT_VERIFY
+        value: "1000"
+
+      # Set the following as secrets in the Render dashboard (do NOT put values here):
+      # JWT_SECRET          — openssl rand -base64 48
+      # SERVER_SIGNING_KEY  — openssl genpkey -algorithm ED25519 | openssl pkey -outform DER | base64 -w 0
+      # APPLE_APP_ID        — TeamID.BundleID  (optional, Apple App Attest)
+      # ANDROID_PACKAGE     — com.example.app  (optional, Play Integrity)
+      # POLYGON_RPC_URL     — https://polygon-rpc.com  (optional, on-chain anchoring)
+      # POLYGON_SIGNER_KEY  — 0x…  (optional)
+      # ANCHOR_CONTRACT_ADDRESS  (optional)
+
+databases:
+  - name: aletheia-db
+    databaseName: aletheia
+    user: aletheia
+    plan: free
