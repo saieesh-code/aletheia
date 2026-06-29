@@ -1,7 +1,7 @@
 # Aletheia — Reality Trust Infrastructure
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/saieesh-code/aletheia/main/aletheia-fixed/public/favicon.ico" alt="Aletheia Logo" width="80">
+  <img src="./docs/banner.png" alt="Aletheia Banner" width="100%">
 </p>
 
 <p align="center">
